@@ -1,3 +1,10 @@
+# NOT USED IN PROJECT - BONUS SCRIPT
+# This script creates classes that learn and store parameters.
+# If, in your personal/work projects, you need 
+# to create bespoke classes that learn parameters i.e. are not 
+# covered in available open source transformers, this script
+# should serve as a template you can adapt.
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -7,12 +14,13 @@ class MeanImputer(BaseEstimator, TransformerMixin):
     """Numerical missing value imputer."""
 
     def __init__(self, variables):
+        # error handling
         if not isinstance(variables, list):
             raise ValueError('variables should be a list')
         self.variables = variables
 
     def fit(self, X, y=None):
-        # persist mean values in a dictionary
+        # persist (store) mean values in a dictionary
         self.imputer_dict_ = X[self.variables].mean().to_dict()
         return self
 
@@ -22,8 +30,6 @@ class MeanImputer(BaseEstimator, TransformerMixin):
             X[feature].fillna(self.imputer_dict_[feature],
                               inplace=True)
         return X
-
-
 
 class RareLabelCategoricalEncoder(BaseEstimator, TransformerMixin):
     """Groups infrequent categories into a single string"""
@@ -42,7 +48,7 @@ class RareLabelCategoricalEncoder(BaseEstimator, TransformerMixin):
 
         for var in self.variables:
             # the encoder will learn the most frequent categories
-            t = pd.Series(X[var].value_counts(normalize=True) 
+            t = pd.Series(X[var].value_counts(normalize=True))
             # frequent labels:
             self.encoder_dict_[var] = list(t[t >= self.tol].index)
 
@@ -59,7 +65,7 @@ class RareLabelCategoricalEncoder(BaseEstimator, TransformerMixin):
 
 
 class CategoricalEncoder(BaseEstimator, TransformerMixin):
-    """String to numbers categorical encoder."""
+    """ String to numbers categorical encoder """
 
     def __init__(self, variables):
 
@@ -70,9 +76,9 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y):
         temp = pd.concat([X, y], axis=1)
-        temp.columns = list(X.columns) + ["target"]
+        temp.columns = list(X.columns) + ["target"] # feature headers
 
-        # persist transforming dictionary
+        # create and fill dictionary for transformer
         self.encoder_dict_ = {}
 
         for var in self.variables:
